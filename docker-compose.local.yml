@@ -1,0 +1,32 @@
+version: "2"
+services:
+  static:
+    image: nginx:1.13-alpine
+    container_name: hacku_static
+    ports:
+      - "8000:80"
+    volumes:
+      - ./tmp:/tmp
+      - ./container_settings/nginx/conf:/etc/nginx/conf.d
+      - ./src/iot_stick/static:/usr/share/www/html/static
+    env_file:
+      - ./container_settings/nginx/nginx.env
+  webapp:
+    image: pddg/geodjango:latest
+    container_name: hacku_webapp
+    volumes:
+      - ./tmp:/tmp
+    env_file:
+      - ./container_settings/geodjango/geodjango.env
+    command: uwsgi --chdir=/opt/hacku --module="iot_stick.wsgi:application" --socket=/tmp/uwsgi.sock --chmod-socket=666 --processes=3 --vacuum
+    depends_on:
+      - db
+#      - broker
+  db:
+    image: mdillon/postgis:9.6-alpine
+    container_name: hacku_db
+    env_file:
+      - ./container_settings/postgis/postgis.env
+#  broker:
+#    image: rabbitmq:latest
+#    container_name: hacku_broker
