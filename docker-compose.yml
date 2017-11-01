@@ -1,7 +1,7 @@
 version: "2"
 services:
   static:
-    image: nginx:1.13-alpine
+    image: nginx:latest
     container_name: hacku_static
     volumes:
       - ./tmp:/tmp
@@ -9,6 +9,10 @@ services:
       - ./src/iot_stick/static:/usr/share/www/html/static
     env_file:
       - ./container_settings/nginx/nginx.env
+    networks:
+      default:
+        aliases:
+          - hacku_static
   webapp:
     image: pddg/geodjango:latest
     container_name: hacku_webapp
@@ -16,15 +20,12 @@ services:
       - ./tmp:/tmp
     env_file:
       - ./container_settings/geodjango/geodjango.env
-    command: python manage.py makemigrations && python manage.py migrate && uwsgi --chdir=/opt/hacku --module="iot_stick.wsgi:application" --socket=/tmp/uwsgi.sock --chmod-socket=666 --processes=3 --vacuum
+    command: uwsgi --chdir=/opt/hacku --module="iot_stick.wsgi:application" --socket=/tmp/uwsgi.sock --chmod-socket=666 --processes=3 --vacuum
     depends_on:
       - db
 #      - broker
     networks:
       default:
-        aliases:
-          - hacku_webapp
-      shared:
         aliases:
           - hacku_webapp
   db:
@@ -45,6 +46,6 @@ services:
 #          - hacku_broker
 
 networks:
-  shared:
+  default:
     external:
       name: internal_shared
