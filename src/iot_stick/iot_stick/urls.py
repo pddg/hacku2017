@@ -18,10 +18,12 @@ from django.contrib import admin
 from django.conf import settings
 
 from tracking.urls import router as tracking_router
+from .views import IndexView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(tracking_router.urls, namespace='tracking'))
+    url(r'^api/', include(tracking_router.urls, namespace='api')),
+    url(r'^', IndexView.as_view(), name='index')
 ]
 
 urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

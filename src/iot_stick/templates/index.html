@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}IoT Stick{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8">
+                <div id="map"></div>
+            </div>
+            <div class="col-xs-12 col-sm-4">
+                <ul class="list-group">
+                    {% for log in modulelogs %}
+                        <li class="list-group-item">{{ log.module.module_id }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+function initMap() {
+    var uluru = {lat: {{ geom.lat }}, lng: {{ geom.lng }} };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 4,
+        center: uluru
+    });
+    var marker = new google.maps.Marker({
+        position: uluru,
+        map: map
+    });
+}
+{% endblock %}
