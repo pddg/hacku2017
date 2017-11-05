@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}HomeLocation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <h1>Home Locationを設定</h1>
+        </div>
+        <div class="col-sm-12">
+            <div id="map" style="'width:100%;"></div>
+        </div>
+        <div class="col-sm-12">
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+                <button class="btn btn-primary" type="submit" value="submit">save</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+var lat_ele = document.getElementById('id_lat');
+var lng_ele = document.getElementById('id_lng');
+
+var lat_parent = lat_ele.parentNode;
+var lng_parent = lng_ele.parentNode;
+
+lat_parent.style.visibility = 'hidden';
+lng_parent.style.visibility = 'hidden';
+
+lat_parent.style.margin = 0;
+lng_parent.style.margin = 0;
+
+lat_parent.style.height = 0;
+lng_parent.style.height = 0;
+
+lat_ele.value = {{ geom.lat }};
+lng_ele.value = {{ geom.lng }};
+
+function initMap() {
+    var kit = {lat: {{ geom.lat }}, lng: {{ geom.lng }} };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: {{ geom.zoom }},
+        center: kit
+    });
+    var marker = new google.maps.Marker({
+        position: kit,
+        map: map
+    });
+    var marker_array = new google.maps.MVCArray();
+
+    function clear_marker() {
+        marker_array.forEach(function (m) {
+            m.setMap(null);
+            m = null;
+        });
+        marker_array.pop()
+    }
+    marker_array.push(marker);
+    map.addListener('click', function (e) {
+        // Delete previous marker
+        clear_marker();
+
+        // Create new marker
+        var lat = e.latLng.lat();
+        var lng = e.latLng.lng();
+        console.log('lat:' + lat);
+        console.log('lng:' + lng);
+
+        var new_marker = new google.maps.Marker({
+            position: {lat: lat, lng:lng}
+        });
+        new_marker.setMap(map);
+        marker_array.push(new_marker);
+
+        // Set values to hidden input
+        lat_ele.value = lat;
+        lng_ele.value = lng;
+
+        console.log('input:', lat_ele.value);
+        console.log('input:', lng_ele.value);
+    })
+}
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrrib_qJbmzInW6EY7sRmxWrgBWCPOsNw&callback=initMap">
+</script>
+{% endblock %}

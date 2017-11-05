@@ -11,25 +11,11 @@
             </div>
             <div class="col-xs-12 col-sm-4">
                 <ul class="list-group">
-                    {% for log in modulelogs %}
-                        <li class="list-group-item">{{ log.module.module_id }}</li>
+                    {% for module in modules %}
+                        <li class="list-group-item"><a href="{% url '' %}">{{ module.module_id }}</a></li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block js %}
-function initMap() {
-    var uluru = {lat: {{ geom.lat }}, lng: {{ geom.lng }} };
-    var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 4,
-        center: uluru
-    });
-    var marker = new google.maps.Marker({
-        position: uluru,
-        map: map
-    });
-}
 {% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Tracking - {{ module.module_id }}{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="col-sm-8">
+            <div id="map"></div>
+        </div>
+        <div class="col-sm-4">
+            <ul class="list-group">
+                {% for location in locations %}
+                <a class="list-group-item" onclick="highlightMarker({{ forloop.revcounter0 }})">
+                    <h4 class="list-group-item-heading">{{ location.created_on }}</h4>
+                    <p class="list-group-item-text">{{ location.lat }}, {{ location.lng }}</p>
+                </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+var map;
+var poly;
+var markers_array;
+var highlightedMarker = null;
+var latestMarker;
+function initMap() {
+    var init_point = {lat: {{ init_point.lat }}, lng: {{ init_point.lng }} };
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: {{ init_point.zoom }},
+        center: init_point
+    });
+    var marker = new google.maps.Marker({
+        position: init_point,
+        map: map
+    });
+    poly = new google.maps.Polyline({
+        strokeColor: '#1e90ff',
+        strokeOpacity: 0.5,
+        strokeWeight: 3,
+        geodesic: true
+    });
+    poly.setMap(map);
+    markers_array = new google.maps.MVCArray();
+    $.ajax({
+        url: 'http://127.0.0.1:8000/api/location/',
+        type: 'GET',
+        dataType: 'json',
+        data: {'module': {{ module.id }}},
+        timeout: 60,
+        success: function (data) {
+            var path = poly.getPath();
+            data.results.forEach(function (result) {
+                var lat_lng = new google.maps.LatLng(
+                    result.geom.coordinates[1],
+                    result.geom.coordinates[0]
+                );
+                var new_marker = new google.maps.Marker({
+                    position: lat_lng,
+                    title: result.created_on,
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: '#1e90ff',
+                        fillOpacity: 0.8,
+                        strokeWeight: 1,
+                        scale: 5
+                    },
+                    map: map
+                });
+                path.push(lat_lng);
+                markers_array.push(new_marker);
+                var latest = markers_array.getAt(0);
+                latestMarker = new google.maps.Marker({
+                    position: {
+                        lat: latest.position.lat(),
+                        lng: latest.position.lng()
+                    },
+                    title: latest.created_on,
+                    map: map
+                })
+            });
+            marker.setMap(null);
+            marker = null;
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+}
+function highlightMarker(index) {
+    var len = markers_array.length;
+    if (highlightedMarker !== null) {
+        highlightedMarker.setAnimation(null);
+    }
+    highlightedMarker = markers_array.getAt(len - index -1);
+    if (highlightedMarker.getAnimation() !== null) {
+        highlightedMarker.setAnimation(null);
+    } else {
+        highlightedMarker.setAnimation(google.maps.Animation.BOUNCE);
+    }
+}
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrrib_qJbmzInW6EY7sRmxWrgBWCPOsNw&callback=initMap">
+</script>
+{% endblock %}

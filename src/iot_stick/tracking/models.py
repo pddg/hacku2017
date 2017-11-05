@@ -47,6 +47,7 @@ class Home(models.Model):
     name = models.CharField("Home", max_length=255)
     geom = models.PointField("Location", srid=4326)
     radius = models.IntegerField("Radius")
+    module = models.ForeignKey(Module, related_name='home', blank=True, null=True)
 
     def __str__(self):
         return self.name

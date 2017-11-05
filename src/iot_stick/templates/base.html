@@ -8,14 +8,12 @@
     <title>{% block title %}index{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    {% block css %}{% endblock %}
 </head>
 <body class="no-thank-yu">
     {% block content %}{% endblock %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script type="text/javascript" src="{% static 'main/js/bootstrap.min.js' %}"></script>
-    <script type="text/javascript">{% block js %}{% endblock %}</script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrrib_qJbmzInW6EY7sRmxWrgBWCPOsNw&callback=initMap">
-    </script>
+    {% block js %}{% endblock %}
 </body>
 </html>
