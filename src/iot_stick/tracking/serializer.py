@@ -1,34 +1,15 @@
 from rest_framework import serializers
-from .models import ModulePostLog, ChannelLog, Module
+from .models import ModulePostLog, ChannelLog, Module, ModuleLocation
 
 
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
-        fields = ('id', 'module_id')
-
-    def to_representation(self, instance):
-        return {
-            'module_id': instance.module_id
-        }
-
-    def to_internal_value(self, data):
-        module_id = data.get('module_id')
-        if not module_id:
-            raise serializers.ValidationError({
-                'module_id': 'This field is required'
-            })
-        return {
-            'module_id': module_id
-        }
-
-    def create(self, validated_data):
-        module_id = validated_data['module_id']
-        return Module.objects.get_or_create(module_id=module_id)
+        fields = ('pk', 'module_id')
 
 
 class ChannelLogSerializer(serializers.ModelSerializer):
-    datetime = serializers.DateTimeField(input_formats='%Y/%m/%dT%H:%M:%S.%SZ')
+    datetime = serializers.DateTimeField(input_formats='%Y/%m/%dT%H:%M:%S.%fZ')
 
     class Meta:
         model = ChannelLog
@@ -39,7 +20,7 @@ class ModulePostLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ModulePostLog
-        fields = ('id', 'module', 'type', 'datetime', 'payload')
+        fields = ('module', 'type', 'datetime', 'payload')
 
     def to_representation(self, instance):
         return {
@@ -75,3 +56,14 @@ class ModulePostLogSerializer(serializers.ModelSerializer):
             ChannelLog.objects.create(module_log=log, **channel)
         return log
 
+
+class ModuleLocationSerializer(serializers.ModelSerializer):
+    module = serializers.SerializerMethodField('get_module_id')
+    created_on = serializers.DateTimeField(input_formats='%Y/%m/%dT%H:%M:%S.%fZ', default_timezone='Asia/Tokyo')
+
+    class Meta:
+        model = ModuleLocation
+        fields = ('geom', 'created_on', 'module')
+
+    def get_module_id(self, obj):
+        return obj.module.module_id

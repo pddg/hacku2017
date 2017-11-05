@@ -11,8 +11,9 @@ class Module(models.Model):
 class ModuleLocation(models.Model):
     module = models.ForeignKey(Module, related_name='locations', blank=True, null=True)
     geom = models.PointField("Location", srid=4326)
+    expired = models.BooleanField("Expired", default=False)
     created_on = models.DateTimeField("Created On")
-    expired_on = models.DateTimeField("Expired On")
+    expired_on = models.DateTimeField("Expired On", blank=True, null=True)
 
     def __str__(self):
         return self.created_on.strftime("%Y-%m-%d %H:%M:%S.%f")

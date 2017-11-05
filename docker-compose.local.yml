@@ -1,24 +1,27 @@
 version: "2"
 services:
-  static:
-    image: nginx:1.13-alpine
-    container_name: hacku_static
-    ports:
-      - "8000:80"
-    volumes:
-      - ./tmp:/tmp
-      - ./container_settings/nginx/conf:/etc/nginx/conf.d
-      - ./src/iot_stick/static:/usr/share/www/html/static
-    env_file:
-      - ./container_settings/nginx/nginx.env
+#  static:
+#    image: nginx:1.13-alpine
+#    container_name: hacku_static
+#    ports:
+#      - "8000:80"
+#    volumes:
+#      - ./tmp:/tmp
+#      - ./container_settings/nginx/conf:/etc/nginx/conf.d
+#      - ./src/iot_stick/static:/usr/share/www/html/static
+#    env_file:
+#      - ./container_settings/nginx/nginx.env
   webapp:
     image: pddg/geodjango:latest
     container_name: hacku_webapp
+    ports:
+      - "8000:8000"
     volumes:
       - ./tmp:/tmp
+      - ./src/iot_stick:/opt/hacku
     env_file:
       - ./container_settings/geodjango/geodjango.env
-    command: uwsgi --chdir=/opt/hacku --module="iot_stick.wsgi:application" --socket=/tmp/uwsgi.sock --chmod-socket=666 --processes=3 --vacuum
+    command: python3 manage.py runserver
     depends_on:
       - db
 #      - broker
