@@ -18,7 +18,8 @@ class HomeForm(forms.Form):
     radius = forms.IntegerField(
         max_value='1000000000',
         min_value='5',
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        initial=50
     )
     module = forms.ModelChoiceField(
         widget=forms.RadioSelect,

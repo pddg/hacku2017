@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ModulePostLog, ChannelLog, Module, ModuleLocation
+from .models import ModulePostLog, ChannelLog, Module, ModuleLocation, Home
 
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -64,6 +64,17 @@ class ModuleLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModuleLocation
         fields = ('geom', 'created_on', 'module')
+
+    def get_module_id(self, obj):
+        return obj.module.module_id
+
+
+class HomeSerializer(serializers.ModelSerializer):
+    module = serializers.SerializerMethodField('get_module_id')
+
+    class Meta:
+        model = Home
+        fields = ('module', 'geom', 'name', 'radius')
 
     def get_module_id(self, obj):
         return obj.module.module_id

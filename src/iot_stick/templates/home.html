@@ -21,7 +21,8 @@
                         {{ field.errors }}
                     </div>
                 {% endfor %}
-                <button class="btn btn-primary" type="submit" value="submit">save</button>
+                <button class="btn btn-primary btn-lg" type="submit" value="submit">save</button>
+                {% if UPDATE %}<a class="btn btn-danger btn-lg" role="button" href="{% url 'home_delete' pk %}">DELETE</a>{% endif %}
             </form>
         </div>
     </div>
@@ -30,6 +31,11 @@
 
 {% block js %}
 <script type="text/javascript">
+var map = null;
+var marker = null;
+var circle = null;
+var radius = null;
+var radius_ele = $('#id_radius');
 var lat_ele = document.getElementById('id_lat');
 var lng_ele = document.getElementById('id_lng');
 
@@ -48,48 +54,99 @@ lng_parent.style.height = 0;
 lat_ele.value = {{ geom.lat }};
 lng_ele.value = {{ geom.lng }};
 
-function initMap() {
-    var kit = {lat: {{ geom.lat }}, lng: {{ geom.lng }} };
-    var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: {{ geom.zoom }},
-        center: kit
-    });
-    var marker = new google.maps.Marker({
-        position: kit,
+{% if UPDATE %}
+document.getElementById('id_name').value = '{{ name }}';
+radius_ele.val({{ radius }});
+document.getElementById('id_module_{{ module_id }}').checked = true;
+{% endif %}
+
+function getCurrentRadius() {
+    return parseInt(radius_ele.val());
+}
+
+function clearMarker() {
+    // Delete previous marker
+    if (marker !== null) {
+        marker.setMap(null);
+        marker = null;
+    }
+}
+
+function drawMarker(latlng) {
+    clearMarker();
+    marker = new google.maps.Marker({
+        position: latlng,
         map: map
     });
-    var marker_array = new google.maps.MVCArray();
+}
 
-    function clear_marker() {
-        marker_array.forEach(function (m) {
-            m.setMap(null);
-            m = null;
-        });
-        marker_array.pop()
+function clearCircle() {
+    // Delete previous circle
+    if (circle !== null) {
+        circle.setMap(null);
+        circle = null;
     }
-    marker_array.push(marker);
-    map.addListener('click', function (e) {
-        // Delete previous marker
-        clear_marker();
+}
 
+function drawCircle(latlng, radius) {
+    clearCircle();
+    circle = new google.maps.Circle({
+      strokeColor: '#EE4400',
+      strokeOpacity: 0.5,
+      strokeWeight: 2,
+      fillColor: '#EE4400',
+      fillOpacity: 0.3,
+      center: latlng,
+      radius: radius
+    });
+    circle.setMap(map);
+}
+
+function animateCircle(latlng, radius) {
+    circle.setOptions({
+        strokeColor: '#EE4400',
+        strokeOpacity: 0.5,
+        strokeWeight: 2,
+        fillColor: '#EE4400',
+        fillOpacity: 0.3,
+        center: latlng,
+        radius: radius,
+        map: map
+    })
+}
+
+function initMap() {
+    radius = getCurrentRadius();
+    var lat_lng = new google.maps.LatLng({{ geom.lat }}, {{ geom.lng }});
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: {{ geom.zoom }},
+        center: lat_lng
+    });
+    drawMarker(lat_lng);
+    drawCircle(lat_lng, radius);
+    // radiusの入力を検知して動的に円の半径を変更
+    radius_ele.keypress(function () {
+       radius = getCurrentRadius();
+       console.log(circle.center, radius);
+       animateCircle(circle.center, radius);
+    });
+    radius_ele.keyup(function (e) {
+        if (e.keyCode === 46 || e.keyCode === 8){
+            radius = getCurrentRadius();
+            console.log(circle.center, radius);
+            animateCircle(circle.center, radius);
+        }
+    });
+    // クリック位置にマーカーと円を移動
+    map.addListener('click', function (e) {
         // Create new marker
         var lat = e.latLng.lat();
         var lng = e.latLng.lng();
-        console.log('lat:' + lat);
-        console.log('lng:' + lng);
-
-        var new_marker = new google.maps.Marker({
-            position: {lat: lat, lng:lng}
-        });
-        new_marker.setMap(map);
-        marker_array.push(new_marker);
-
+        drawMarker({lat: lat, lng: lng});
+        animateCircle({lat: lat, lng: lng}, radius);
         // Set values to hidden input
         lat_ele.value = lat;
         lng_ele.value = lng;
-
-        console.log('input:', lat_ele.value);
-        console.log('input:', lng_ele.value);
     })
 }
 </script>

@@ -9,6 +9,22 @@
             <div id="map"></div>
         </div>
         <div class="col-sm-4">
+            <div class="panel  panel-primary">
+                <div class="panel-heading">
+                    <h3>Home</h3>
+                </div>
+                <ul class="list-group">
+                    {% for home in homes %}
+                    <a class="list-group-item" href="{% url 'home_detail' home.pk %}">
+                        <h4 class="list-group-item-heading">{{ home.name }} - 半径{{ home.radius }}m</h4>
+                        <p class="list-group-item-text">{{ home.geom.y }} - {{ home.geom.x }}</p>
+                    </a>
+                    {% endfor %}
+                </ul>
+                <div class="panel-footer">
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-block">Homeを追加する</a>
+                </div>
+            </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3>Logs</h3>
@@ -30,29 +46,52 @@
 <script type="text/javascript">
 var map;
 var poly;
+var marker;
 var markers_array;
 var highlightedMarker = null;
 var latestMarker;
-function initMap() {
-    var init_point = {lat: {{ init_point.lat }}, lng: {{ init_point.lng }} };
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: {{ init_point.zoom }},
-        center: init_point
-    });
-    var marker = new google.maps.Marker({
-        position: init_point,
+
+function drawNormalMarker(latlng, created_on) {
+    return new google.maps.Marker({
+        position: latlng,
+        title: created_on,
+        animation: google.maps.Animation.DROP,
         map: map
     });
-    poly = new google.maps.Polyline({
-        strokeColor: '#1e90ff',
-        strokeOpacity: 0.5,
-        strokeWeight: 3,
-        geodesic: true
+}
+
+function drawCircleMarker(latlng, created_on) {
+    return new google.maps.Marker({
+        position: latlng,
+        title: created_on,
+        animation: google.maps.Animation.DROP,
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#1e90ff',
+            fillOpacity: 0.8,
+            strokeWeight: 1,
+            scale: 5
+        },
+        map: map
     });
-    poly.setMap(map);
-    markers_array = new google.maps.MVCArray();
+}
+
+function drawCircle(latlng, radius) {
+    return new google.maps.Circle({
+        strokeColor: '#EE4400',
+        strokeOpacity: 0.5,
+        strokeWeight: 2,
+        fillColor: '#EE4400',
+        fillOpacity: 0.3,
+        center: latlng,
+        radius: radius,
+        map: map
+    });
+}
+
+function ajaxMarkerDrawer() {
     $.ajax({
-        url: 'http://127.0.0.1:8000/api/location/',
+        url: '/api/location/',
         type: 'GET',
         dataType: 'json',
         data: {'module': {{ module.id }}},
@@ -64,31 +103,14 @@ function initMap() {
                     result.geom.coordinates[1],
                     result.geom.coordinates[0]
                 );
-                var new_marker = new google.maps.Marker({
-                    position: lat_lng,
-                    title: result.created_on,
-                    animation: google.maps.Animation.DROP,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        fillColor: '#1e90ff',
-                        fillOpacity: 0.8,
-                        strokeWeight: 1,
-                        scale: 5
-                    },
-                    map: map
-                });
+                var new_marker = drawCircleMarker(lat_lng, result.created_on);
                 path.push(lat_lng);
                 markers_array.push(new_marker);
                 var latest = markers_array.getAt(0);
-                latestMarker = new google.maps.Marker({
-                    position: {
-                        lat: latest.position.lat(),
-                        lng: latest.position.lng()
-                    },
-                    animation: google.maps.Animation.DROP,
-                    title: latest.created_on,
-                    map: map
-                })
+                latestMarker = drawNormalMarker({
+                    lat: latest.position.lat(),
+                    lng: latest.position.lng()
+                }, latest.created_on);
             });
             marker.setMap(null);
             marker = null;
@@ -97,6 +119,52 @@ function initMap() {
             console.log(e);
         }
     });
+}
+
+function ajaxCircleDrawer() {
+    $.ajax({
+        url: '/api/home/',
+        type: 'GET',
+        dataType: 'json',
+        data: {'module': {{ module.id }}},
+        timeout: 60,
+        success: function (data) {
+            data.results.forEach(function (result) {
+                var latlng = new google.maps.LatLng(
+                    result.geom.coordinates[1],
+                    result.geom.coordinates[0]
+                );
+                drawCircle(latlng, result.radius);
+                var m = drawNormalMarker(latlng, result.name);
+                m.setLabel("H");
+            })
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    })
+}
+
+function initMap() {
+    var init_point = {lat: {{ init_point.lat }}, lng: {{ init_point.lng }} };
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: {{ init_point.zoom }},
+        center: init_point
+    });
+    marker = new google.maps.Marker({
+        position: init_point,
+        map: map
+    });
+    poly = new google.maps.Polyline({
+        strokeColor: '#1e90ff',
+        strokeOpacity: 0.5,
+        strokeWeight: 3,
+        geodesic: true
+    });
+    poly.setMap(map);
+    markers_array = new google.maps.MVCArray();
+    ajaxMarkerDrawer();
+    ajaxCircleDrawer();
 }
 function highlightMarker(index) {
     var len = markers_array.length;

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Home{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-offset-2 col-sm-8">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h1>Homeを消去</h1>
+                    </div>
+                    <div class="panel-body">
+                            <p>"{{ object.name }}"を削除してもよろしいですか?</p>
+                    </div>
+                    <table class="table table-responsive table-bordered">
+                        <tr>
+                            <td>Name</td>
+                            <td>{{ object.name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Latitude</td>
+                            <td>{{ object.geom.y }}</td>
+                        </tr>
+                        <tr>
+                            <td>Longitude</td>
+                            <td>{{ object.geom.x }}</td>
+                        </tr>
+                        <tr>
+                            <td>Radius</td>
+                            <td>{{ object.radius }}</td>
+                        </tr>
+                    </table>
+                    <div class="panel-footer">
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-primary btn-lg" type="submit" value="submit">OK</button>
+                            <a href="{% url 'home_detail' object.pk %}" class="btn btn-danger btn-lg" role="button">CANCEL</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

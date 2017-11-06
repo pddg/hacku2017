@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from django.views.generic import TemplateView
-from .models import Module, ModulePostLog, ModuleLocation
-from .serializer import ModuleSerializer, ModulePostLogSerializer, ModuleLocationSerializer
+from .models import Module, ModulePostLog, ModuleLocation, Home
+from .serializer import ModuleSerializer, ModulePostLogSerializer, ModuleLocationSerializer, HomeSerializer
 
 
 class ModulesViewSets(viewsets.ReadOnlyModelViewSet):
@@ -23,16 +23,26 @@ class ModuleLocationViewSets(viewsets.ReadOnlyModelViewSet):
     distance_filter_convert_meters = True
 
 
+class HomeViewSets(viewsets.ReadOnlyModelViewSet):
+    queryset = Home.objects.all()
+    serializer_class = HomeSerializer
+    filter_fields = ('module', 'name')
+    distance_filter_field = 'geom'
+    distance_filter_convert_meters = True
+
+
 class ModuleDetailView(TemplateView):
     template_name = 'tracking/module-detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(ModuleDetailView, self).get_context_data(**kwargs)
         m = Module.objects.get(id=self.kwargs['id'])
+        print(m.home)
         context['module'] = {
             'id': m.pk,
-            'module_id': m.module_id
+            'module_id': m.module_id,
         }
+        context['homes'] = m.home.all()
         locations = m.locations.order_by('-created_on').all()
         context['init_point'] = {
             'lat': locations[0].geom.y,
