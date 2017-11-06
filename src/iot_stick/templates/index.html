@@ -10,11 +10,18 @@
                 <div id="map"></div>
             </div>
             <div class="col-xs-12 col-sm-4">
-                <ul class="list-group">
-                    {% for module in modules %}
-                        <li class="list-group-item"><a href="{% url '' %}">{{ module.module_id }}</a></li>
-                    {% endfor %}
-                </ul>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h2>Modules</h2>
+                    </div>
+                    <ul class="list-group">
+                        {% for module in modules %}
+                            <li class="list-group-item listed-link-box">
+                                <a class='listed-link' href="{% url 'tracking:module' module.pk %}">{{ module.module_id }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

@@ -1,4 +1,13 @@
 #map {
-    height: 500px;
+    height: 700px;
     width: 100%;
+}
+
+.listed-link-box {
+    padding: 0;
+}
+
+.listed-link {
+    padding: 10px 20px;
+    display: block;
 }

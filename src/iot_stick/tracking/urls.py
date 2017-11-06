@@ -14,6 +14,6 @@ router.register(r'postlogs', ModulePostLogViewSets)
 router.register(r'location', ModuleLocationViewSets)
 
 urlpatterns = [
-    url(r'^module/(?P<id>\d+)/$', ModuleDetailView.as_view())
+    url(r'^module/(?P<id>\d+)/$', ModuleDetailView.as_view(), name='module')
 ]
 

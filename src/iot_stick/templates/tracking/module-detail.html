@@ -9,14 +9,19 @@
             <div id="map"></div>
         </div>
         <div class="col-sm-4">
-            <ul class="list-group">
-                {% for location in locations %}
-                <a class="list-group-item" onclick="highlightMarker({{ forloop.revcounter0 }})">
-                    <h4 class="list-group-item-heading">{{ location.created_on }}</h4>
-                    <p class="list-group-item-text">{{ location.lat }}, {{ location.lng }}</p>
-                </a>
-                {% endfor %}
-            </ul>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Logs</h3>
+                </div>
+                <ul class="list-group">
+                    {% for location in locations %}
+                    <a class="list-group-item" onclick="highlightMarker({{ forloop.revcounter0 }})">
+                        <h4 class="list-group-item-heading">{{ location.created_on }}</h4>
+                        <p class="list-group-item-text">{{ location.lat }}, {{ location.lng }}</p>
+                    </a>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -80,6 +85,7 @@ function initMap() {
                         lat: latest.position.lat(),
                         lng: latest.position.lng()
                     },
+                    animation: google.maps.Animation.DROP,
                     title: latest.created_on,
                     map: map
                 })
