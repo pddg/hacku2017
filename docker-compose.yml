@@ -23,11 +23,24 @@ services:
     command: uwsgi --chdir=/opt/hacku --module="iot_stick.wsgi:application" --socket=/tmp/uwsgi.sock --chmod-socket=666 --processes=3 --vacuum
     depends_on:
       - db
-#      - broker
+      - broker
     networks:
       default:
         aliases:
           - hacku_webapp
+  worker:
+    image: pddg/geodjango:latest
+    container_name: hacku_worker
+    env_file:
+      - ./container_settings/geodjango/geodjango.env
+    command: celery -A iot_stick worker
+    depends_on:
+      - db
+      - broker
+    networks:
+      default:
+        aliases:
+          - hacku_worker
   db:
     image: mdillon/postgis:9.6-alpine
     container_name: hacku_db
@@ -37,13 +50,13 @@ services:
       default:
         aliases:
           - hacku_db
-#  broker:
-#    image: rabbitmq:latest
-#    container_name: hacku_broker
-#    networks:
-#      default:
-#        aliases:
-#          - hacku_broker
+  broker:
+    image: rabbitmq:latest
+    container_name: hacku_broker
+    networks:
+      default:
+        aliases:
+          - hacku_broker
 
 networks:
   default:
