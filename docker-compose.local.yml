@@ -24,12 +24,12 @@ services:
     command: python3 manage.py runserver
     depends_on:
       - db
-#      - broker
+      - broker
   db:
     image: mdillon/postgis:9.6-alpine
     container_name: hacku_db
     env_file:
       - ./container_settings/postgis/postgis.env
-#  broker:
-#    image: rabbitmq:latest
-#    container_name: hacku_broker
+  broker:
+    image: rabbitmq:latest
+    container_name: hacku_broker

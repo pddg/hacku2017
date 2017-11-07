@@ -2,9 +2,11 @@ import os
 from celery import Celery
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iot_stick.settings')
 
-app = Celery('proj')
+from django.conf import settings
+
+app = Celery('iot_stick')
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
@@ -13,7 +15,7 @@ app = Celery('proj')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django app configs.
-app.autodiscover_tasks()
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
 @app.task(bind=True)
