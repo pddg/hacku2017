@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView, DeleteView
 from django.contrib.gis.geos import Point
 from django.core.urlresolvers import reverse_lazy
-from tracking.models import Module, ModuleLocation, Home
+from tracking.models import Home
 from django.shortcuts import redirect
 from tracking.forms import HomeForm, Module
 
@@ -12,7 +12,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         modules = [m for m in Module.objects.all() if m.locations.all().count() != 0]
-        print(modules)
         latlng = [(m.locations.first().geom.y, m.locations.first().geom.x) for m in modules]
         context['modules'] = modules
         context['init_point'] = {

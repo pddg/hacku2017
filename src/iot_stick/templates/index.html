@@ -40,10 +40,11 @@ var points = [
     {% endfor %}
 ];
 
-function drawMarker(latlng) {
+function drawMarker(latlng, index) {
     return new google.maps.Marker({
         position: latlng,
-        map: map
+        map: map,
+        label: index.toString()
     })
 }
 
@@ -53,8 +54,10 @@ function initMap() {
         zoom: {{ init_point.zoom }},
         center: init_point
     });
+    var i = 1;
     points.forEach(function (p) {
-        drawMarker(p);
+        drawMarker(p, i);
+        i++;
     })
 }
 </script>
