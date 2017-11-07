@@ -16,13 +16,49 @@
                     </div>
                     <ul class="list-group">
                         {% for module in modules %}
-                            <li class="list-group-item listed-link-box">
-                                <a class='listed-link' href="{% url 'tracking:module' module.pk %}">{{ module.module_id }}</a>
-                            </li>
+                        <a class='list-group-item' href="{% url 'tracking:module' module.pk %}">
+                            <h4 class="list-group-item-heading ">{{ forloop.counter }} - {{ module.module_id }}</h4>
+                            <p class="list-group-item-text latest-update">Latest Update: {{ module.locations.all.0.created_on }}</p>
+                        </a>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+var map;
+var points = [
+    {% for module in modules %}
+    {
+        lat: {{ module.locations.first.geom.y }},
+        lng: {{ module.locations.first.geom.x }}
+    },
+    {% endfor %}
+];
+
+function drawMarker(latlng) {
+    return new google.maps.Marker({
+        position: latlng,
+        map: map
+    })
+}
+
+function initMap() {
+    var init_point = {lat: {{ init_point.lat }}, lng: {{ init_point.lng }} };
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: {{ init_point.zoom }},
+        center: init_point
+    });
+    points.forEach(function (p) {
+        drawMarker(p);
+    })
+}
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrrib_qJbmzInW6EY7sRmxWrgBWCPOsNw&callback=initMap">
+</script>
 {% endblock %}

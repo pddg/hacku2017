@@ -11,8 +11,15 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        context['modules'] = Module.objects.all()
-        context['geom'] = {'lat': -25.363, 'lng': 131.044, 'zoom': 15}
+        modules = [m for m in Module.objects.all() if m.locations.all().count() != 0]
+        print(modules)
+        latlng = [(m.locations.first().geom.y, m.locations.first().geom.x) for m in modules]
+        context['modules'] = modules
+        context['init_point'] = {
+            'lat': sum([l[0] for l in latlng])/len(latlng),
+            'lng': sum([l[1] for l in latlng])/len(latlng),
+            'zoom': 15
+        }
         return context
 
 

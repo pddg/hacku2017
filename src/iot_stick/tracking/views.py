@@ -37,7 +37,6 @@ class ModuleDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ModuleDetailView, self).get_context_data(**kwargs)
         m = Module.objects.get(id=self.kwargs['id'])
-        print(m.home)
         context['module'] = {
             'id': m.pk,
             'module_id': m.module_id,
