@@ -18,13 +18,14 @@ from django.contrib import admin
 from django.conf import settings
 
 from tracking.urls import router as tracking_router
-from .views import IndexView, HomeLocationCreateView, HomeLocationUpdateView, HomeDeleteView
+from .views import IndexView, HomeLocationCreateView, HomeLocationUpdateView, HomeDeleteView, NotificationLogListView
 
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^home/(?P<id>\d+)/$', HomeLocationUpdateView.as_view(), name='home_detail'),
     url(r'^home/(?P<pk>\d+)/delete/$', HomeDeleteView.as_view(), name='home_delete'),
     url(r'^home/$', HomeLocationCreateView.as_view(), name='home'),
+    url(r'^notifications/$', NotificationLogListView.as_view(), name='notify'),
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(tracking_router.urls, namespace='api')),
     url(r'^tracking/', include('tracking.urls', namespace='tracking')),

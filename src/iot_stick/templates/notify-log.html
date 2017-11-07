@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Notification Logs{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h2>Notifications</h2>
+                    </div>
+                    <ul class="list-group">
+                        {% for obj in object_list %}
+                        <li class='list-group-item {% if obj.status == 0 %}list-group-item-success{% else %}list-group-item-danger{% endif %}'>
+                            <h4 class="list-group-item-heading">{{ obj.get_state_display }} {{ obj.home }}</h4>
+                            <p class="list-group-item-text latest-update">at {{ obj.created_on }}</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,7 +1,7 @@
-from django.views.generic import TemplateView, DeleteView
+from django.views.generic import TemplateView, DeleteView, ListView
 from django.contrib.gis.geos import Point
 from django.core.urlresolvers import reverse_lazy
-from tracking.models import Home
+from tracking.models import Home, NotificationLog
 from django.shortcuts import redirect
 from tracking.forms import HomeForm, Module
 
@@ -89,3 +89,10 @@ class HomeDeleteView(DeleteView):
     model = Home
     template_name = 'delete_home.html'
     success_url = reverse_lazy('index')
+
+
+class NotificationLogListView(ListView):
+    template_name = 'notify-log.html'
+    model = NotificationLog
+    ordering = ("-created_on",)
+

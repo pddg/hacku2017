@@ -1,7 +1,12 @@
 from rest_framework import viewsets
 from django.views.generic import TemplateView
 from .models import Module, ModulePostLog, ModuleLocation, Home
-from .serializer import ModuleSerializer, ModulePostLogSerializer, ModuleLocationSerializer, HomeSerializer
+from .serializer import (
+    ModuleSerializer,
+    ModulePostLogSerializer,
+    ModuleLocationSerializer,
+    HomeSerializer,
+)
 
 
 class ModulesViewSets(viewsets.ReadOnlyModelViewSet):
@@ -48,11 +53,5 @@ class ModuleDetailView(TemplateView):
             'lng': locations[0].geom.x,
             'zoom': 16
         }
-        context['locations'] = []
-        for loc in locations:
-            context['locations'].insert(0, {
-                'lat': loc.geom.y,
-                'lng': loc.geom.x,
-                'created_on': loc.created_on.strftime('%Y/%m/%d %H:%M:%S.%f')
-            })
+        context['locations'] = locations
         return context

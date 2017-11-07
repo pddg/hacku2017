@@ -31,9 +31,9 @@
                 </div>
                 <ul class="list-group">
                     {% for location in locations %}
-                    <a class="list-group-item" onclick="highlightMarker({{ forloop.revcounter0 }})">
+                    <a class="list-group-item" onclick="highlightMarker({{ forloop.counter0 }})">
                         <h4 class="list-group-item-heading">{{ location.created_on }}</h4>
-                        <p class="list-group-item-text">{{ location.lat }}, {{ location.lng }}</p>
+                        <p class="list-group-item-text">{{ location.geom.y }}, {{ location.geom.x }}</p>
                     </a>
                     {% endfor %}
                 </ul>
@@ -171,7 +171,7 @@ function highlightMarker(index) {
     if (highlightedMarker !== null) {
         highlightedMarker.setAnimation(null);
     }
-    highlightedMarker = markers_array.getAt(len - index -1);
+    highlightedMarker = markers_array.getAt(index);
     if (highlightedMarker.getAnimation() !== null) {
         highlightedMarker.setAnimation(null);
     } else {
