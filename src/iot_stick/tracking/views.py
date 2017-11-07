@@ -10,7 +10,7 @@ class ModulesViewSets(viewsets.ReadOnlyModelViewSet):
 
 
 class ModulePostLogViewSets(viewsets.ModelViewSet):
-    queryset = ModulePostLog.objects.all()
+    queryset = ModulePostLog.objects.order_by('-datetime').all()
     serializer_class = ModulePostLogSerializer
     filter_fields = ('module', 'type')
 
