@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 
 {% block title %}Tracking - {{ module.module_id }}{% endblock %}
 
@@ -9,7 +10,58 @@
             <div id="map"></div>
         </div>
         <div class="col-sm-4">
-            <div class="panel  panel-primary">
+        {% if locations.0.is_knocked_down == 1 %}
+            {% if locations.0.state == 1 %}
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3>State - Danger</h3>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-sm-3">
+                        <img class="img-responsive" src="{% static 'main/images/iot_stick_danger.png' %}">
+                    </div>
+                    <div class="col-xs-8 col-sm-9">
+                        <div class="state-message-box">
+                            <h4 class="state-message">杖が倒れています（外出中）</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3>State - Warning</h3>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-sm-3">
+                        <img class="img-responsive" src="{% static 'main/images/iot_stick_warn.png' %}">
+                    </div>
+                    <div class="col-xs-8 col-sm-9">
+                        <div class="state-message-box">
+                            <h4 class="state-message">杖が倒れています</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3>State</h3>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-sm-3">
+                        <img class="img-responsive" src="{% static 'main/images/iot_stick_normal.png' %}">
+                    </div>
+                    <div class="col-xs-8 col-sm-9">
+                        <div class="state-message-box">
+                            <h4 class="state-message">杖の状態は正常です．</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+            <div class="panel  panel-info">
                 <div class="panel-heading">
                     <h3>Home</h3>
                 </div>
