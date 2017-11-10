@@ -58,6 +58,9 @@ class ModulePostLogSerializer(serializers.ModelSerializer):
             ChannelLog.objects.create(module_log=log, **channel)
         channels = log.payload.order_by("channel").all()
         # 変な値が紛れ込まないようチェック
+        # GPSの値が取得できなかった場合弾く
+        if channels[0].value != 0 and channels[1].type != 0:
+            return log
         # channel数が3以外の時は値が余計 or 足りない
         if channels.count() != 3:
             return log
