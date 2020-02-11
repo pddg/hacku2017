@@ -1,4 +1,4 @@
-Django==1.11.6
+Django==1.11.28
 Pillow==4.3.0
 psycopg2==2.7.3.2
 pytz==2017.2
